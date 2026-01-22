@@ -11,9 +11,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		2FD58DDF2F22453700783A9D /* Vault */ = {
+		2FD58E992F22476600783A9D /* Sources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Vault;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		2FD58DD42F22453700783A9D = {
 			isa = PBXGroup;
 			children = (
-				2FD58DDF2F22453700783A9D /* Vault */,
+				2FD58E992F22476600783A9D /* Sources */,
 				2FD58DDE2F22453700783A9D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,7 +61,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				2FD58DDF2F22453700783A9D /* Vault */,
+				2FD58E992F22476600783A9D /* Sources */,
 			);
 			name = Vault;
 			packageProductDependencies = (
