@@ -122,7 +122,37 @@ struct ContentView: View {
                     .presentationBackground(.clear) // Transparent backdrop for custom modal look
             }
         }
-
+        .onAppear {
+            checkTrialExpirations()
+        }
+    }
+    
+    // MARK: - Logic
+    
+    private func checkTrialExpirations() {
+        let today = Date()
+        // Fetch active subscriptions that are marked as free
+        let descriptor = FetchDescriptor<RecurringSubscription>(predicate: #Predicate { $0.isFree == true && $0.isActive == true })
+        
+        do {
+            let subscriptions = try modelContext.fetch(descriptor)
+            
+            for sub in subscriptions {
+                if let trialEnd = sub.trialEndDate, trialEnd < today {
+                    // Trial has ended
+                    print("Trial ended for \(sub.name). Switching to paid.")
+                    sub.isFree = false
+                    // We keep trialEndDate for history
+                    
+                    // Generate transactions to cover the period since trial ended
+                    sub.generatePastTransactions(context: modelContext)
+                }
+            }
+            // Save context if changes occurred
+             try? modelContext.save()
+        } catch {
+            print("Failed to check trial expirations: \(error)")
+        }
     }
 }
 

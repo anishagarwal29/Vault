@@ -36,9 +36,15 @@ struct TransactionRow: View {
                 // .dateTime.day().month(.wide).year() gives "January 12, 2026" (US) or "12 January 2026" (UK/others).
                 // To force order, we can format manually or trust standard long format which usually includes these fields appropriately.
                 // User asked for "date month year", which usually implies order DD MM YYYY.
-                Text(transaction.date.formatted(Date.FormatStyle().year().month(.wide).day().locale(Locale(identifier: "en_GB"))))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if transaction.subscription != nil {
+                    Text("Subscription • \(transaction.date.formatted(Date.FormatStyle().year().month(.wide).day().locale(Locale(identifier: "en_GB"))))")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text(transaction.date.formatted(Date.FormatStyle().year().month(.wide).day().locale(Locale(identifier: "en_GB"))))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
             .padding(.leading, 8)
             
@@ -156,7 +162,9 @@ struct TransactionRow: View {
     }
     
     private var titleText: String {
-        if transaction.type == .transfer {
+        if let subscription = transaction.subscription {
+            return subscription.name
+        } else if transaction.type == .transfer {
             return "Transfer"
         } else {
             return transaction.category?.name ?? "Uncategorized"
