@@ -9,6 +9,9 @@ struct FinanceTrackerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    NotificationManager.shared.requestAuthorization()
+                }
         }
         .modelContainer(container)
         .windowStyle(.hiddenTitleBar)
