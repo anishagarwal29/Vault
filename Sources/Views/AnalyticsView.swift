@@ -61,8 +61,7 @@ struct AnalyticsView: View {
     
     // MARK: Body
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
+        VStack(spacing: 24) {
             
                 // Filter Control Bar
                 VStack(spacing: 20) {
@@ -108,7 +107,6 @@ struct AnalyticsView: View {
             }
             .padding(.bottom, 50)
         }
-    }
     
     // MARK: Subviews
     private var emptyStateView: some View {

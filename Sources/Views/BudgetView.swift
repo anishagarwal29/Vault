@@ -50,59 +50,56 @@ struct BudgetView: View {
                     AccountFilterView(selectedAccount: $selectedAccountFilter)
                         .padding(.vertical, 10)
                 }
-                .background(Color(nsColor: .windowBackgroundColor)) // Matches the header background
                 .zIndex(1) // Ensures it stays above scrolling content if creating overlap effects
 
                 // MARK: Main Content Area
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Empty State
-                        if filteredBudgets.isEmpty {
-                            VStack(spacing: 16) {
-                                Image(systemName: "chart.bar.doc.horizontal")
-                                    .font(.system(size: 48))
-                                    .foregroundColor(.secondary.opacity(0.5))
-                                    
-                                Text("No Budgets Found")
-                                    .font(.title3)
-                                    .fontWeight(.medium)
+                VStack(spacing: 24) {
+                    // Empty State
+                    if filteredBudgets.isEmpty {
+                        VStack(spacing: 16) {
+                            Image(systemName: "chart.bar.doc.horizontal")
+                                .font(.system(size: 48))
+                                .foregroundColor(.secondary.opacity(0.5))
                                 
-                                if selectedAccountFilter != nil {
-                                     Text("No budgets linked to this account.")
-                                        .foregroundColor(.secondary)
-                                } else {
-                                    Text("Go to Settings to set monthly budgets for Categories or Accounts.")
-                                        .foregroundColor(.secondary)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal)
-                                }
+                            Text("No Budgets Found")
+                                .font(.title3)
+                                .fontWeight(.medium)
+                            
+                            if selectedAccountFilter != nil {
+                                 Text("No budgets linked to this account.")
+                                    .foregroundColor(.secondary)
+                            } else {
+                                Text("Go to Settings to set monthly budgets for Categories or Accounts.")
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
                             }
-                            .padding(40)
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.secondary.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [5]))
-                            )
-                            .padding()
-                        } else {
-                            // Budget List
-                            // Uses LazyVStack for performance optimization with many items
-                            LazyVStack(spacing: 20) {
-                                ForEach(filteredBudgets) { budget in
-                                    BudgetCard(
-                                        budget: budget, 
-                                        transactions: transactions, 
-                                        currency: currency,
-                                        filterAccount: selectedAccountFilter
-                                    )
-                                }
-                            }
-                            .padding(.horizontal)
                         }
+                        .padding(40)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.secondary.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [5]))
+                        )
+                        .padding()
+                    } else {
+                        // Budget List
+                        // Uses LazyVStack for performance optimization with many items
+                        LazyVStack(spacing: 20) {
+                            ForEach(filteredBudgets) { budget in
+                                BudgetCard(
+                                    budget: budget, 
+                                    transactions: transactions, 
+                                    currency: currency,
+                                    filterAccount: selectedAccountFilter
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
                     }
-                    .padding(.bottom, 40)
-                    .padding(.top, 20)
                 }
+                .padding(.bottom, 40)
+                .padding(.top, 20)
             }
         }
         .onAppear {

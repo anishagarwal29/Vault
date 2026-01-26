@@ -42,111 +42,105 @@ struct AllTransactionsView: View {
     
     // MARK: Body
     var body: some View {
-        VStack(spacing: 0) {
-            // Top Bar
-            VStack(spacing: 16) {
-                HStack {
-                    Text("Transactions")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Spacer()
-                    
-
-                }
-                
-                HStack(spacing: 12) {
-                    // Search Bar
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                // Top Bar
+                VStack(spacing: 16) {
                     HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.secondary)
-                        TextField("Search transactions...", text: $searchText)
-                            .textFieldStyle(.plain)
-                        if !searchText.isEmpty {
-                            Button(action: { searchText = "" }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.secondary)
+                        Text("Transactions")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                    }
+                    
+                    HStack(spacing: 12) {
+                        // Search Bar
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.secondary)
+                            TextField("Search transactions...", text: $searchText)
+                                .textFieldStyle(.plain)
+                            if !searchText.isEmpty {
+                                Button(action: { searchText = "" }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.secondary)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
+                        .padding(10)
+                        .background(Color.secondary.opacity(0.1))
+                        .cornerRadius(10)
+                        
+                        // Filter
+                        Menu {
+                            Button(action: { selectedTypeFilter = nil }) {
+                                Label("All", systemImage: "line.3.horizontal.circle")
+                            }
+                            Button(action: { selectedTypeFilter = .income }) {
+                                Label("Income", systemImage: "arrow.down.left")
+                            }
+                            Button(action: { selectedTypeFilter = .expense }) {
+                                Label("Expense", systemImage: "arrow.up.right")
+                            }
+                            Button(action: { selectedTypeFilter = .transfer }) {
+                                Label("Transfer", systemImage: "arrow.right.arrow.left")
+                            }
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.title2)
+                                .foregroundColor(.primary)
+                        }
+                        .menuStyle(.borderlessButton)
+                        .frame(width: 32)
                     }
-                    .padding(10)
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(10)
                     
-                    // Filter
-                    Menu {
-                        Button(action: { selectedTypeFilter = nil }) {
-                            Label("All", systemImage: "line.3.horizontal.circle")
-                        }
-                        Button(action: { selectedTypeFilter = .income }) {
-                            Label("Income", systemImage: "arrow.down.left")
-                        }
-                        Button(action: { selectedTypeFilter = .expense }) {
-                            Label("Expense", systemImage: "arrow.up.right")
-                        }
-                        Button(action: { selectedTypeFilter = .transfer }) {
-                            Label("Transfer", systemImage: "arrow.right.arrow.left")
-                        }
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                            .font(.title2)
-                            .foregroundColor(.primary)
-                    }
-                    .menuStyle(.borderlessButton)
-                    .frame(width: 32)
-                    
+                    // Account Filter
+                    AccountFilterView(selectedAccount: $selectedAccountFilter)
                 }
+                .padding(.horizontal)
+                .padding(.top)
                 
-                // Account Filter
-                AccountFilterView(selectedAccount: $selectedAccountFilter)
-            }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 20)
-            .padding(.top, 40) // Push down from window controls
-            .background(Color(nsColor: .windowBackgroundColor))
-            .zIndex(1)
-            
-            // List
-            if filteredTransactions.isEmpty {
-                Spacer()
-                Text("No transactions found")
-                    .foregroundColor(.secondary)
-                Spacer()
-            } else {
-                List {
-                    // Spacer for top padding
-                    Color.clear
-                        .frame(height: 10)
-                        .listRowSeparator(.hidden)
-                    
-                    ForEach(filteredTransactions) { transaction in
-                        TransactionRow(transaction: transaction, onEdit: {
-                            editingTransaction = transaction // Used editingTransaction in onEdit
-                        }, onDelete: {
-                            deleteTransaction(transaction)
-                        })
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                        .contextMenu {
-                            Button(role: .destructive) {
+                // Transactions List
+                if filteredTransactions.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "doc.text.magnifyingglass")
+                            .font(.system(size: 48))
+                            .foregroundColor(.secondary.opacity(0.5))
+                        Text("No transactions found")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(40)
+                } else {
+                    LazyVStack(spacing: 12) {
+                        ForEach(filteredTransactions) { transaction in
+                            TransactionRow(transaction: transaction, onEdit: {
+                                editingTransaction = transaction
+                            }, onDelete: {
                                 deleteTransaction(transaction)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
+                            })
+                            .contextMenu {
+                                Button("Edit") { editingTransaction = transaction }
+                                Button("Delete", role: .destructive) { deleteTransaction(transaction) }
                             }
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                deleteTransaction(transaction)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
+                            
+                            if transaction.id != filteredTransactions.last?.id {
+                                Divider().opacity(0.1)
                             }
                         }
                     }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.ultraThinMaterial)
+                    )
+                    .padding(.horizontal)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
             }
+            .padding(.bottom, 80) // Space for floating button
         }
         .sheet(item: $editingTransaction) { transaction in
             AddTransactionSheet(transactionToEdit: transaction)
