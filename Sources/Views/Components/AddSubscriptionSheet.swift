@@ -28,7 +28,7 @@ struct AddSubscriptionSheet: View {
         self.account = account
         self.subscriptionToEdit = subscriptionToEdit
     }
-    
+    //
     var body: some View {
         ZStack {
             // Background
